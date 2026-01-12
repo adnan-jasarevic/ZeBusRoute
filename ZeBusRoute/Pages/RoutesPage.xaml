@@ -1,42 +1,229 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ZeBusRoute.ViewModels"
+             xmlns:models="clr-namespace:ZeBusRoute.Models"
              x:Class="ZeBusRoute.Pages.RoutesPage"
-             Title="🚌 Rute Zenica">
+             Title="Linije">
 
-    <RefreshView IsRefreshing="{Binding IsRefreshing}">
-        <CollectionView x:Name="RoutesListView"
-                        ItemsSource="{Binding Linije}"
-                        SelectionMode="Single"
-                        SelectionChanged="OnRouteSelected">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Padding="15" Margin="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackLayout Grid.Column="0">
-                            <Label Text="{Binding Naziv}"
-                                   FontSize="18"
-                                   FontAttributes="Bold"/>
-                            <Label Text="{Binding Smjer}"
-                                   FontSize="14"
-                                   TextColor="Gray"/>
-                        </StackLayout>
-                        <Frame Grid.Column="1"
-                               BackgroundColor="LightBlue"
-                               Padding="10"
-                               CornerRadius="20"
-                               HorizontalOptions="End">
-                            <Label Text="{Binding Id, StringFormat='{0} linija'}"
-                                   FontSize="12"
-                                   FontAttributes="Bold"/>
-                        </Frame>
+    <ContentPage.BindingContext>
+        <vm:RoutesViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!-- Lista linija -->
+        <ScrollView IsVisible="{Binding JeListaLinijaVidljiva}">
+            <VerticalStackLayout Spacing="0">
+                <!-- Header -->
+                <Grid BackgroundColor="#8BC34A" Padding="20,15">
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="&#xf207;" 
+                               FontFamily="FontAwesome" 
+                               FontSize="28" 
+                               TextColor="White" 
+                               VerticalOptions="Center"/>
+                        <Label Text="Linije i Redovi Vožnje" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="White" 
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Grid>
+
+                <!-- Filtri -->
+                <VerticalStackLayout Padding="20" Spacing="15" BackgroundColor="White">
+                    <!-- Day Type Filter -->
+                    <Label Text="Tip Dana" 
+                           FontSize="16" 
+                           TextColor="#9E9E9E" 
+                           Margin="0,0,0,10"/>
+                    
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                Text="Radni dan"
+                                BackgroundColor="{Binding RadniDanBojaPositine}"
+                                TextColor="{Binding RadniDanBojaTeksta}"
+                                CornerRadius="20"
+                                Command="{Binding OdaberiTipDanaCommand}"
+                                CommandParameter="RadniDan"/>
+                           
+                        <Button Grid.Column="1"
+                                Text="Vikend"
+                                BackgroundColor="{Binding VikendBojaPositine}"
+                                TextColor="{Binding VikendBojaTeksta}"
+                                CornerRadius="20"
+                                Command="{Binding OdaberiTipDanaCommand}"
+                                CommandParameter="Vikend"/>
+                        
+                        <Button Grid.Column="2"
+                                Text="Praznik"
+                                BackgroundColor="{Binding PraznikBojaPositine}"
+                                TextColor="{Binding PraznikBojaTeksta}"
+                                CornerRadius="20"
+                                Command="{Binding OdaberiTipDanaCommand}"
+                                CommandParameter="Praznik"/>
                     </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </RefreshView>
 
+                    <!-- Time of Day Filter -->
+                    <Label Text="Doba Dana" 
+                           FontSize="16" 
+                           TextColor="#9E9E9E" 
+                           Margin="0,10,0,10"/>
+                    
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                Text="Jutro"
+                                BackgroundColor="{Binding JutroBojaPositine}"
+                                TextColor="{Binding JutroBojaTeksta}"
+                                CornerRadius="20"
+                                FontSize="14"
+                                Command="{Binding OdaberiVrijemeUDanu}"
+                                CommandParameter="Jutro"/>
+                        
+                        <Button Grid.Column="1"
+                                Text="Podne"
+                                BackgroundColor="{Binding PodneBojaPositine}"
+                                TextColor="{Binding PodneBojaTeksta}"
+                                CornerRadius="20"
+                                FontSize="14"
+                                Command="{Binding OdaberiVrijemeUDanu}"
+                                CommandParameter="Podne"/>
+                        
+                        <Button Grid.Column="2"
+                                Text="Večer"
+                                BackgroundColor="{Binding VecerBojaPositine}"
+                                TextColor="{Binding VecerBojaTeksta}"
+                                CornerRadius="20"
+                                FontSize="14"
+                                Command="{Binding OdaberiVrijemeUDanu}"
+                                CommandParameter="Vecer"/>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Available Lines -->
+                <VerticalStackLayout Padding="20,10" Spacing="0" BackgroundColor="#F5F5F5">
+                    <Label Text="Dostupne Linije" 
+                           FontSize="18" 
+                           TextColor="#9E9E9E" 
+                           Margin="0,10,0,15"/>
+
+                    <CollectionView ItemsSource="{Binding FiltriraneLinije}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Linija">
+                                <Frame Padding="0" 
+                                       Margin="0,0,0,15" 
+                                       BackgroundColor="White" 
+                                       CornerRadius="15" 
+                                       HasShadow="True">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RoutesViewModel}}, Path=OdaberiLinijuCommand}"
+                                                              CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+                                    <Grid Padding="20" ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                                        <!-- Line Number Badge -->
+                                        <Frame Grid.Column="0"
+                                           BackgroundColor="#8BC34A"
+                                           WidthRequest="60"
+                                           HeightRequest="60"
+                                           CornerRadius="30"
+                                           Padding="0"
+                                           HasShadow="False"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                                           <Label Text="{Binding Id}" 
+                                               FontSize="28" 
+                                               FontAttributes="Bold" 
+                                               TextColor="White" 
+                                               HorizontalOptions="Center" 
+                                               VerticalOptions="Center"/>  
+                                        </Frame>
+
+                                        <!-- Line Info -->
+                                        <VerticalStackLayout Grid.Column="1" 
+                                                             VerticalOptions="Center" 
+                                                             Spacing="5">
+                                            <Label Text="{Binding Naziv}" 
+                                                   FontSize="20" 
+                                                   FontAttributes="Bold" 
+                                                   TextColor="#424242"/>
+                                            <Label Text="{Binding Smjer}" 
+                                                   FontSize="15" 
+                                                   TextColor="#9E9E9E"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Raspored za odabranu liniju -->
+        <ScrollView IsVisible="{Binding JeRasporedVidljiv}" 
+                    BackgroundColor="#F5F5F5">
+            <VerticalStackLayout Spacing="0">
+                <!-- Schedule Header -->
+                <Grid BackgroundColor="#8BC34A" Padding="20,15">
+                    <HorizontalStackLayout Spacing="15">
+                        <Button Text="&#xf060;" 
+                                FontFamily="FontAwesome" 
+                                FontSize="20" 
+                                TextColor="White" 
+                                BackgroundColor="Transparent"
+                                Command="{Binding VratiSeNaLinijeCommand}"/>
+                        <Label Text="{Binding OdabranaLinija.Naziv, StringFormat='Raspored linije {0}'}" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="White" 
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <Frame BackgroundColor="#A5D6A7" 
+                           Padding="12,6" 
+                           CornerRadius="15" 
+                           HasShadow="False"
+                           HorizontalOptions="End"
+                           VerticalOptions="Center">
+                        <Label Text="{Binding OdabraniTipDana}" 
+                               FontSize="14" 
+                               FontAttributes="Bold" 
+                               TextColor="White"/>
+                    </Frame>
+                </Grid>
+
+                <!-- Schedule List -->
+                <CollectionView ItemsSource="{Binding Polasci}"
+                                Margin="20,20,20,20">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:PolasakSaStanicom">
+                            <Grid Padding="0,15" ColumnDefinitions="Auto,*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                    <Label Text="{Binding Vrijeme, StringFormat='{0:HH:mm}'}" 
+                                           FontSize="24" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#424242"/>
+                                    <Label Text="{Binding Stanica}" 
+                                           FontSize="14" 
+                                           TextColor="#9E9E9E"/>
+                                </VerticalStackLayout>
+
+                                <Frame Grid.Column="2"
+                                       BackgroundColor="{Binding StatusColor}"
+                                       Padding="15,8"
+                                       CornerRadius="15"
+                                       HasShadow="False"
+                                       VerticalOptions="Center">
+                                    <Label Text="{Binding Status}" 
+                                           FontSize="13" 
+                                           FontAttributes="Bold" 
+                                           TextColor="White"/>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

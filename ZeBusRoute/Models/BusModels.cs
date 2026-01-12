@@ -21,6 +21,7 @@ public class Polazak
     public int LinijaId { get; set; }
     public TimeOnly Vrijeme { get; set; }
     public string Rezim { get; set; } = ""; // "SD", "CG", "ŠN"
+    public string Status { get; set; } = "On time"; // Za prikaz statusa
 }
 
 public class TicketType
@@ -42,4 +43,18 @@ public class UserTicket
     public string StatusDisplay => IsActive ? "Active" : "Expired";
     public Color StatusColor => IsActive ? Color.FromArgb("#8BC34A") : Color.FromArgb("#9E9E9E");
     public string QrCodeData { get; set; } = "";
+}
+
+public class LinijaRaspored
+{
+    public Linija? Linija { get; set; }
+    public List<PolasakSaStanicom> Polasci { get; set; } = new();
+}
+
+public class PolasakSaStanicom
+{
+    public TimeOnly Vrijeme { get; set; }
+    public string Stanica { get; set; } = "";
+    public string Status { get; set; } = "On time";
+    public Color StatusColor => Status == "On time" ? Color.FromArgb("#8BC34A") : Color.FromArgb("#FF5252");
 }
