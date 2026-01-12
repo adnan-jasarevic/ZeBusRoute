@@ -41,7 +41,7 @@ public static class DataService
         // Provjeri da li je baza popunjena
         using var checkCmd = conn.CreateCommand();
         checkCmd.CommandText = "SELECT COUNT(*) FROM Linije";
-        if ((long)checkCmd.ExecuteScalar() == 0)
+        if (checkCmd.ExecuteScalar() is long count && count == 0)
         {
             SeedData(conn);
         }

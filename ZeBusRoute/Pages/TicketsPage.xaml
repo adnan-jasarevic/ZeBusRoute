@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:ZeBusRoute.ViewModels"
              xmlns:models="clr-namespace:ZeBusRoute.Models"
              x:Class="ZeBusRoute.Pages.TicketsPage"
-             Title="Tickets">
+             Title="Karte">
 
     <ContentPage.BindingContext>
         <vm:TicketsViewModel />
@@ -20,7 +20,7 @@
                        FontSize="28" 
                        TextColor="White" 
                        VerticalOptions="Center"/>
-                <Label Text="Tickets" 
+                <Label Text="Karte" 
                        FontSize="28" 
                        FontAttributes="Bold" 
                        TextColor="White" 
@@ -28,49 +28,47 @@
             </HorizontalStackLayout>
         </Grid>
 
-        <!-- Tab Headers -->
+        <!-- tabovi -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*" HeightRequest="50">
             <Button Grid.Column="0"
                     Text="KUPI KARTU"
                     BackgroundColor="Transparent"
-                    TextColor="{Binding SelectedTabIndex, Converter={StaticResource TabColorConverter}, ConverterParameter=0}"
+                    TextColor="{Binding BuyTicketsTabColor}"
                     FontAttributes="Bold"
                     FontSize="14"
                     BorderWidth="0"
                     CornerRadius="0"
-                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TicketsViewModel}}, Path=ChangeTabCommand}"
-                    CommandParameter="0"
-                    Clicked="OnBuyTicketsTabClicked"/>
+                    Command="{Binding ChangeTabCommand}"
+                    CommandParameter="0"/>
 
             <BoxView Grid.Column="0"
                      HeightRequest="3"
                      BackgroundColor="#8BC34A"
                      VerticalOptions="End"
-                     IsVisible="{Binding SelectedTabIndex, Converter={StaticResource EqualConverter}, ConverterParameter=0}"/>
+                     IsVisible="{Binding BuyTicketsUnderlineVisible}"/>
 
             <Button Grid.Column="1"
                     Text="MOJE KARTE"
                     BackgroundColor="Transparent"
-                    TextColor="{Binding SelectedTabIndex, Converter={StaticResource TabColorConverter}, ConverterParameter=1}"
+                    TextColor="{Binding MyTicketsTabColor}"
                     FontAttributes="Bold"
                     FontSize="14"
                     BorderWidth="0"
                     CornerRadius="0"
-                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TicketsViewModel}}, Path=ChangeTabCommand}"
-                    CommandParameter="1"
-                    Clicked="OnMyTicketsTabClicked"/>
+                    Command="{Binding ChangeTabCommand}"
+                    CommandParameter="1"/>
 
             <BoxView Grid.Column="1"
                      HeightRequest="3"
                      BackgroundColor="#8BC34A"
                      VerticalOptions="End"
-                     IsVisible="{Binding SelectedTabIndex, Converter={StaticResource EqualConverter}, ConverterParameter=1}"/>
+                     IsVisible="{Binding MyTicketsUnderlineVisible}"/>
         </Grid>
 
         <!-- Content Area -->
         <Grid Grid.Row="2">
             <!-- kupi kartu tab -->
-            <ScrollView IsVisible="{Binding SelectedTabIndex, Converter={StaticResource EqualConverter}, ConverterParameter=0}"
+            <ScrollView IsVisible="{Binding IsBuyTicketsTabVisible}"
                         BackgroundColor="#F5F5F5">
                 <VerticalStackLayout Padding="20" Spacing="15">
                     <Label Text="Odaberite kartu" 
@@ -136,11 +134,11 @@
                            HasShadow="False"
                            Margin="0,10,0,20">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="💡 Quick Tips" 
+                            <Label Text="💡 Brzi Savjeti" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#558B2F"/>
-                            <Label Text="• Jednokratne karte vaze 30 minuta" 
+                            <Label Text="• Jednokratne karte važe 30 minuta" 
                                    FontSize="13" 
                                    TextColor="#689F38"/>
                             <Label Text="• Dnevne karte se aktiviraju prvom upotrebom" 
@@ -149,7 +147,7 @@
                             <Label Text="• Mjesečne karte su validne 30 dana" 
                                    FontSize="13" 
                                    TextColor="#689F38"/>
-                            <Label Text="• Sve karte su digitalne, bez fizicke kopije" 
+                            <Label Text="• Sve karte su digitalne, bez fizičke kopije" 
                                    FontSize="13" 
                                    TextColor="#689F38"/>
                         </VerticalStackLayout>
@@ -158,7 +156,7 @@
             </ScrollView>
 
             <!-- My Tickets Tab -->
-            <ScrollView IsVisible="{Binding SelectedTabIndex, Converter={StaticResource EqualConverter}, ConverterParameter=1}"
+            <ScrollView IsVisible="{Binding IsMyTicketsTabVisible}"
                         BackgroundColor="#F5F5F5">
                 <VerticalStackLayout Padding="20" Spacing="20">
                     <CollectionView ItemsSource="{Binding MojeKarte}">
@@ -169,7 +167,7 @@
                                        BackgroundColor="White" 
                                        CornerRadius="15" 
                                        HasShadow="True">
-                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                                         <Label Grid.Row="0" Grid.Column="0"
                                                Text="{Binding Type}" 
                                                FontSize="22" 
@@ -220,7 +218,7 @@
                                         </Grid>
 
                                         <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
-                                               Text="Show this QR code to the driver" 
+                                               Text="Pokažite ovaj QR kod vozaču" 
                                                FontSize="14" 
                                                TextColor="#9E9E9E" 
                                                HorizontalOptions="Center" 

@@ -24,11 +24,30 @@ public class TicketsViewModel : INotifyPropertyChanged
             {
                 _selectedTabIndex = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(BuyTicketsTabColor));
+                OnPropertyChanged(nameof(MyTicketsTabColor));
+                OnPropertyChanged(nameof(IsBuyTicketsTabVisible));
+                OnPropertyChanged(nameof(IsMyTicketsTabVisible));
+                OnPropertyChanged(nameof(BuyTicketsUnderlineVisible));
+                OnPropertyChanged(nameof(MyTicketsUnderlineVisible));
             }
         }
     }
 
+    // Tab Colors
+    public Color BuyTicketsTabColor => SelectedTabIndex == 0 ? Color.FromArgb("#8BC34A") : Color.FromArgb("#9E9E9E");
+    public Color MyTicketsTabColor => SelectedTabIndex == 1 ? Color.FromArgb("#8BC34A") : Color.FromArgb("#9E9E9E");
+
+    // Tab Visibility
+    public bool IsBuyTicketsTabVisible => SelectedTabIndex == 0;
+    public bool IsMyTicketsTabVisible => SelectedTabIndex == 1;
+    
+    // Underline Visibility
+    public bool BuyTicketsUnderlineVisible => SelectedTabIndex == 0;
+    public bool MyTicketsUnderlineVisible => SelectedTabIndex == 1;
+
     public ICommand PurchaseTicketCommand { get; }
+    public ICommand ChangeTabCommand { get; }
 
     public TicketsViewModel()
     {
@@ -73,6 +92,15 @@ public class TicketsViewModel : INotifyPropertyChanged
         };
 
         PurchaseTicketCommand = new Command<TicketType>(OnPurchaseTicket);
+        ChangeTabCommand = new Command<string>(OnChangeTab);
+    }
+
+    private void OnChangeTab(string tabIndex)
+    {
+        if (int.TryParse(tabIndex, out int index))
+        {
+            SelectedTabIndex = index;
+        }
     }
 
     private async void OnPurchaseTicket(TicketType? ticket)
